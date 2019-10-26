@@ -1,8 +1,8 @@
 {
-  "name": "rpncalc",
+  "name": "cli-rpn-calc",
   "version": "1.0.0",
   "description": "Command-line RPN Calculator.",
-  "keywords": ["calc","calculator","rpn","command-line","cli","revese"],
+  "keywords": ["calc","calculator","rpn","command-line","cli","reverse","polish","notation"],
   "main": "index.js",
   "author": "PAL BCN <palbcn@yahoo.com>",
   "license": "Unlicense",
