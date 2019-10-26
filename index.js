@@ -7,53 +7,53 @@ PAL Barcelona. 2018 <palbcn@yahoo.com>
  */
 (function rcNS(){
 
-	let  help = () => console.log(`
+	function help () {
+	  console.log(`
+RPN Calculator 
+by PAL Barcelona. <palbcn@yahoo.com>
 
-	RPN Calculator 
-	by PAL Barcelona. <palbcn@yahoo.com>
+rpncalc [--options] [operands operators]
 
-		rpncalc [--options] [operands operators]
+options
+	--help 
+	--debug 
+	--fullstack  return full stack 
 
-		options
-			--help 
-			--debug 
-			--fullstack  return full stack 
+operands
+	any number f.ex. 9.99
+	or in hexadecimal 0x99
+	or in scientific notation 9e99
 
-		operands
-			any number f.ex. 9.99
-			or in hexadecimal 0x99
-			or in scientific notation 9e99
+two-operand math operators
+	'+' '-' '*' '/': arithmetic add, sub, mul, div
+	'%': modulo
+	'^' 'p': power
+	'v': root 
+	
+single-operand math operators 
+	'f': floor
+	'r': round
+	'n': negative, chs, -x
+	'i': inverse, 1/x
+	'a': abs
+	'l': ln
+	'e': exp
+	's': sin 
+	'c': cos   
+	't': arcTan
 
-		two-operand math operators
-			'+' '-' '*' '/': arithmetic add, sub, mul, div
-			'%': modulo
-			'^' 'p': power
-			'v': root 
-			
-		single-operand math operators 
-			'f': floor
-			'r': round
-			'n': negative, chs, -x
-			'i': inverse, 1/x
-			'a': abs
-			'l': ln
-			'e': exp
-			's': sin 
-			'c': cos   
-			't': arcTan
+no-operand operators
+	'P': pi, π 
+	'E': e
+	'A': aleatory, random
 
-		no-operand operators
-			'P': pi, π 
-			'E': e
-			'A': aleatory, random
-		
-		stack manipulation  
-			'x': exchange x<->y
-			'=': duplicate x, enter
-			'S': store y in x 
-			'R': recall from x 
-	`);
-
+stack manipulation  
+	'x': exchange x<->y
+	'=': duplicate x, enter
+	'S': store y in x 
+	'R': recall from x 
+		`);
+	}
 	/** 
 		parses an arguments list (like the obtained with process.argv)
 		into an options object (that begin with --) and a parameters array.
@@ -93,20 +93,23 @@ PAL Barcelona. 2018 <palbcn@yahoo.com>
 		stack.map(showValue);
 	}
 
+
+
 	/**
 	 * 
-	 * the reverse polish notation calculator 
-	 * 
-	 * @param {string or array of strings} opers operands and operators, if is an string, it is split first.
-	 * @param {object} options { debug, help, fullStack }
-	 * @returns {number or array of numbers} the result or the results stack 
+	 * the reverse polish notation calculator function primitive
+	 * @param {object} calc represents the calculator
+	 * @param {array of strings} opers operands and operators
+	 * @param {object} options
+	 * @returns {object} the calculator 
 	 * 
 	 */
-	function rpn( opers, options = {}) {
-    /* opers should be an array of strings, if not and is an string, split it first */
-		if (typeof opers === 'string') opers = opers.split(' ');
-
+	function rpnprim(calc, opers, options) {
 		/* primitive function for two-operand operations  */
+		let stack = calc.stack;
+		let store = calc.store;
+		let cnt = 0;  //aux counter
+
 		function op2(op, a, b) {
 			switch (op) {
 				case '+':
@@ -125,7 +128,7 @@ PAL Barcelona. 2018 <palbcn@yahoo.com>
 				case 'v':
 					return Math.pow(a, 1 / b);
 				case 'S':
-					store[b]=a;
+					store[b] = a;
 					return a;
 				default:
 					throw ('internal error, operator ' + op);
@@ -155,47 +158,41 @@ PAL Barcelona. 2018 <palbcn@yahoo.com>
 				case 't':
 					return Math.atan(a);
 				case 'R':
-					if (!store[a]) throw ('inexistent storage ' + a );
+					if (!store[a]) throw ('inexistent storage ' + a);
 					return store[a];
 				default:
 					throw ('internal error, operator ' + op);
 			}
 		}
 
-		/* the stack of operands, intermediate results and final results */
-		let stack = [];
-		/* the store of auxiliary values stored and recalled */
-		let store = {};
-		
-		let cnt = 0;  //aux counter
-		if (options.debug) console.log(0,JSON.stringify(opers));
+		if (options.debug) console.log(0, JSON.stringify(opers));
 		/* operators and operands loop */
 		while (opers && opers.length) {
 			let op = opers.shift();
 			cnt++;
-			
+
 			/* if it's numeric, is an operand, push it into the stack */
 			if (isNumeric(op)) {
 				stack.push(Number(op));
 
-			/* if it's a two-operand operator */
-			} else if (['+', '-', '*', '/', '%', '^', 'v', 'p','S'].includes(op)) {			
-				
+				/* if it's a two-operand operator */
+			} else if (['+', '-', '*', '/', '%', '^', 'v', 'p', 'S'].includes(op)) {
+
 				if (stack.length < 2)
 					throw (op + " requires 2 operands");
 				let b = stack.pop();
 				let a = stack.pop();
 				stack.push(op2(op, a, b));
 
-			/* if it's a one-operand operator */
+				/* if it's a one-operand operator */
 			} else if (['f', 'r', 'n', 'i', 'a', 'l', 'e', 's', 'c', 't', 'R'].includes(op)) {
-				
+
 				if (stack.length < 1)
 					throw (op + " requires 1 operand");
 				let a = stack.pop();
 				stack.push(op1(op, a));
-			
-			/* if it's a non-operand operator */
+
+				/* if it's a non-operand operator */
 			} else if (['P', 'E', 'A'].includes(op)) {
 				if (op == 'P') {
 					stack.push(Math.PI);
@@ -205,10 +202,10 @@ PAL Barcelona. 2018 <palbcn@yahoo.com>
 					stack.push(Math.random());
 				}
 
-			/* if it's an special operator: stack manipulation */
+				/* if it's an special operator: stack manipulation */
 			} else if (op == 'x') {
 				if (stack.length < 2)
-				throw (op + " requires 2 operands");
+					throw (op + " requires 2 operands");
 				let b = stack.pop();
 				let a = stack.pop();
 				stack.push(b);
@@ -225,11 +222,36 @@ PAL Barcelona. 2018 <palbcn@yahoo.com>
 				throw ('unknown operator ' + op);
 			}
 			if (options.debug) console.log(cnt, op, stack, store);
-
 		}
-		if (options.fullStack) return stack.reverse();
-		else return stack.pop();
+    return calc;
 	}
+
+	/**
+	 * 
+	 * the calculator function 
+	 * 
+	 * @param {string or array of strings} opers operands and operators, if is an string, it is split first.
+	 * @param {object} options { debug, help, fullStack }
+	 * @returns {number or array of numbers} the result or the results stack 
+	 * 
+	 */
+	function rpn( opers, options = {}) {
+    /* opers should be an array of strings, if not and is an string, split it first */
+		if (typeof opers === 'string') opers = opers.split(' ');
+		
+		let calc = { 
+			stack: [], /* the stack of operands, intermediate results and final results */
+			store: {}  /* the store of auxiliary values stored and recalled */
+		};	
+		rpnprim(calc,opers,options);
+		if (options.fullStack) return calc.stack.reverse();
+		else return calc.stack.pop();
+	}
+
+	/*function rpnFactory(){
+		if parms return result
+		else return progressivfunction
+	}*/
 
 	if (module.parent) {
 		module.exports = rpn;
