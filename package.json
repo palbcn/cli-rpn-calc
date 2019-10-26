@@ -5,12 +5,13 @@
   "keywords": ["calc","calculator","rpn","command-line","cli","revese"],
   "main": "index.js",
   "author": "PAL BCN <palbcn@yahoo.com>",
-  "license": "MIT",
+  "license": "Unlicense",
   "bin": "./index.js",
   "scripts": {
     "test": "jest"
-  },
+  },  
   "devDependencies": {
     "jest": "^24.9.0"
-  }
+  },
+  "repository": "github:palbcn/rpncalc"
 }
