@@ -1,5 +1,6 @@
 const rpn = require('./index');
 
+
 describe("basic stack functionality", () => {
   let res = rpn('10 0x20 -20.23 -1.1e3'.split(" "),{fullStack:true});
 
@@ -65,3 +66,20 @@ describe("value store", () => {
   });
 });
 
+describe("basic factory", () => {
+  let calc = rpn();
+  it('returns a calculator object', () => {
+    expect(typeof (calc)).toBe("object");
+  });
+  it('contains an stack', () => {
+    expect(Array.isArray(calc.stack)).toBe(true);
+  });
+
+  it('permits calculations', () => {
+    expect(calc.calculate('100 1 2 + 3 +')).toBe(6);
+  });
+
+  it('permits chaining calculations', () => {
+    expect(calc.calculate('4 +')).toBe(10);
+  });
+});
